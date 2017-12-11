@@ -11,10 +11,11 @@ def getWorkerID():
         return int(sys.argv[1])
     return 1
 
-reposName = ""
+reposName = "CS4400---Internet-Applications"
 workerID = getWorkerID()
 
 ###########General Config###########
+Main_FOLDER = "/home/donal-tuohy/Documents/SS_year/Cyclo-complexity/Workers"
 Worker_FOLDER = "/home/donal-tuohy/Documents/SS_year/Cyclo-complexity/Workers/worker" + str(workerID)
 MAIN_SERVER = "http://127.0.0.1:5000/"
 
@@ -33,7 +34,7 @@ def getWorkerID():
 
 #Returns a file from the local directory
 def getFile(filePath):
-    fileRead = open(REPO_FOLDER + filePath, 'r+t')
+    fileRead = open(filePath, 'r+t')
     source = fileRead.read()
     return source     
 
@@ -42,18 +43,24 @@ def setRepoName(repoName):
 
 def cloneRepo(cloneURL):
     print("WorkerID = ", workerID)
-    subprocess.call(['./getRepo.sh', workerID, cloneURL])
+    subprocess.call(["bash", Main_FOLDER + "/getRepo.sh",str(workerID), cloneURL])
 
 def checkoutCommit(sha):
     print("Checking out " + sha)
-    subprocess.call(['./getCommit.sh', workerID, reposName, sha])
+    print("Repo Name:", reposName)
+    subprocess.call(["bash", Main_FOLDER + "/getCommit.sh",str(workerID), reposName, sha])
 
 def getListOfFiles():
     listOfFiles =[]
     for path, subdirs, files in os.walk(Worker_FOLDER):
+        print("Files: ", files)
+        print("subdirs:", subdirs)
         for filename in files:
-            f = os.path.join(path, filename)
-            listOfFiles.append(f)
+            checker = filename.split('.')
+            print("Checker:", checker)
+            if(checker[1] == 'py'):
+                f = os.path.join(path, filename)
+                listOfFiles.append(f)
     return listOfFiles    
 
 def getComplexityScore(source):
@@ -65,6 +72,7 @@ def getComplexityAverage():
     listOfFiles = getListOfFiles()
     totalFiles = len(listOfFiles)
     for filename in listOfFiles:
+        print("Computing: ", filename)
         source = getFile(filename)
         sum += getComplexityScore(source)
     return sum/totalFiles
@@ -90,7 +98,6 @@ def computeComplexity():
     return jsonify({'complexityScore' : complexity })
 
 
-
 if __name__ == "__main__":
 
     workerID = getWorkerID()
@@ -98,8 +105,6 @@ if __name__ == "__main__":
     directory = 'worker' + str(workerID) 
     if not os.path.exists(directory):
         os.makedirs(directory)
-
-    print(getListOfFiles())
 
     portNum = 5000 + workerID
 
