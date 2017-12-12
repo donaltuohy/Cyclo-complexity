@@ -47,12 +47,6 @@ if __name__ == "__main__":
     for count in range(len(listOfCommits)):
         dictOfCommits[count] = [listOfCommits[count], False, 0] 
 
-    #Send the sha to a worker
-
-    print("\n\nList of commit sha's in", repoName)
-    print("__________________________________")
-    for commit in dictOfCommits.values():
-        print(commit[0], ",  ", commit[1], ",   ", commit[2])
 
     #Send each commit to a worker
     for commit in dictOfCommits.values():
@@ -63,7 +57,20 @@ if __name__ == "__main__":
             commit[2] = ((response.json())['complexityScore'])
         else:
             print("Commit could not be computed.")
+    
+    
+    #Results
     print("\n\nList of commit sha's in", repoName)
-    print("__________________________________")
+    print("_________________________________________________________________________")
+    print("SHA                                      Checked        Avg. Complexity")
+    print("_________________________________________________________________________")
+    sum = 0
     for commit in dictOfCommits.values():
+        sum += commit[2]
         print(commit[0], ",  ", commit[1], ",   ", commit[2])
+
+    print("_________________________________________________________________________\n")
+    print("Average complexity for repo:", sum/len(dictOfCommits), "\n\n")
+    
+
+

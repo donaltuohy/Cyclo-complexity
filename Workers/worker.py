@@ -53,19 +53,19 @@ def checkoutCommit(sha):
 def getListOfFiles():
     listOfFiles =[]
     for path, subdirs, files in os.walk(Worker_FOLDER):
-        print("Files: ", files)
-        print("subdirs:", subdirs)
         for filename in files:
-            checker = filename.split('.')
-            print("Checker:", checker)
-            if(checker[1] == 'py'):
+            if(filename.endswith('.py')):
                 f = os.path.join(path, filename)
                 listOfFiles.append(f)
     return listOfFiles    
 
 def getComplexityScore(source):
-    RadonList = mi_parameters(source)
-    return RadonList[1]
+    try:
+        RadonList = mi_parameters(source)
+        return RadonList[1]
+    except:
+        print("Unable to compute complexity for this file.")
+        return -1
 
 def getComplexityAverage():
     sum = 0
