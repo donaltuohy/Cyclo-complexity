@@ -105,6 +105,8 @@ if __name__ == "__main__":
     directory = 'worker' + str(workerID) 
     if not os.path.exists(directory):
         os.makedirs(directory)
+    print("MAKING DIRECTORY:", directory)
+    
 
     portNum = 5000 + workerID
 
