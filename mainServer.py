@@ -1,15 +1,18 @@
 import flask, requests, git, threading, time
+import matplotlib.pyplot as plt
 from flask import Flask
+import time
+
 
 listOfCommits = []
 dictOfCommits = {}
-threads = []
+threads = {}
 
 ###Config###
-REPO_LINK = "https://api.github.com/repos/donaltuohy/CS4400---Internet-Applications"
-CLONE_URL = "https://github.com/donaltuohy/CS4400---Internet-Applications.git"
+REPO_LINK = "https://api.github.com/repos/python/pythondotorg"
+CLONE_URL = "https://github.com/python/pythondotorg.git"
 COMMITS_LINK = REPO_LINK + "/commits"
-listOfWorkers = ["http://127.0.0.1:5001/","http://127.0.0.1:5002/"]
+listOfWorkers = ["http://127.0.0.1:5001/", "http://127.0.0.1:5002/", "http://127.0.0.1:5003/", "http://127.0.0.1:5004/", "http://127.0.0.1:5005/", "http://127.0.0.1:5006/", "http://127.0.0.1:5007/"]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisShouldBeSecret'
@@ -45,6 +48,8 @@ def workerThreadFunction(workerAddress):
             (dictOfCommits[key])[2] = False
             print("Commit could not be computed.")
 
+#def computePerNode(numberOfNodes):
+
 
 if __name__ == "__main__":
 
@@ -77,18 +82,18 @@ if __name__ == "__main__":
 
     #Send each commit to a worker
     for address in listOfWorkers:
-        print(address)
-        thread = threading.Thread(target = workerThreadFunction, args = (address,)).start()
-        threads.append(thread)
+        start_time = time.time()
+        threads[address] =threading.Thread(target = workerThreadFunction, args = (address,))
+        ((threads[address]).start())
         print("Thread started on:", address)
     
 
     #Wait for all the threads to finish
-    for thread in threads:
+    for thread in threads.values():
         if thread:
             thread.join()
 
-    time.sleep(5)
+    #time.sleep(5)
     
     #Results
     print("\n\nList of commit sha's in", repoName)
@@ -103,5 +108,5 @@ if __name__ == "__main__":
     print("_________________________________________________________________________\n")
     print("Average complexity for repo:", sum/len(dictOfCommits), "\n\n")
     
-
+    print("\n--- %s seconds ---" % (time.time() - start_time))
 
